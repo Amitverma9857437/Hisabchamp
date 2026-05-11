@@ -1,0 +1,1591 @@
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+<meta charset="UTF-8" />  
+<meta name="viewport" content="width=device-width,initial-scale=1" />  
+
+<title>HisabChamp - Maths Quiz Game</title>  <!-- PWA -->  <link rel="manifest" href="manifest.json" />  
+<meta name="theme-color" content="#1976d2" />
+<meta name="title" content="HisabChamp - Maths Quiz Game" />
+<meta name="twitter:titel" content="HisabChamp - Maths Quiz Game" /> 
+<meta name="og:titel" content="HisabChamp - Maths Quiz Game" />
+ <meta name="description" content="">
+ <meta property="" content="">
+ <meta property="" content="">
+ <style>  
+  :root{  
+    --bg: #f7f9fc;  
+    --fg: #0f172a;  
+    --card: #ffffff;  
+    --primary: #1976d2;  
+    --muted: #64748b;  
+    --accent: #42a5f5;  
+  }  
+  body.dark{  
+    --bg:#0b1220;  
+    --fg:#e5e7eb;  
+    --card:#121826;  
+    --primary:#60a5fa;  
+    --muted:#9aa7bd;  
+    --accent:#93c5fd;  
+  }  
+  
+  *{box-sizing:border-box;
+  overflow:auto; }  
+  body{  
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;  
+    background: var(--bg); 
+    color: var(--fg);  
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;  
+   
+  }  
+  
+  header{  
+    position:sticky; 
+    top:0; 
+    z-index:10;  
+    background: linear-gradient(135deg, #00c3ff, #ffff1c);
+    color:#fff; 
+    padding:14px 16px; 
+    text-align:center; 
+    font-weight:700;  
+    box-shadow: 0 2px 12px rgba(0,0,0,.2);  
+  }  
+  
+  .container{
+   padding:14px; 
+   max-width:980px; 
+   margin:0 auto 80px;}  
+  
+  .card{  
+    background:var(--card); 
+    border:1px solid rgba(0,0,0,.06);  
+    border-radius:16px; 
+    padding:16px; 
+    box-shadow: 0 6px 20px rgba(0,0,0,.08);  
+    margin-bottom:16px;  
+  }
+    
+  
+  h2{
+  margin:0 0 12px 0; 
+  font-size:20px
+  }  
+  .row{
+  display:flex; 
+  flex-wrap:wrap; 
+  gap:8px
+  }  
+  input, select, button, textarea{  
+    font: inherit; 
+    padding:10px 12px; 
+    border-radius:10px; 
+    border:1px solid #cbd5e1;  
+    background:transparent; 
+    color:inherit;  
+  }  
+  .level-popup{
+  position:fixed;
+  top:20%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  background:linear-gradient(45deg,#f7d774,#f1c40f);
+  color:#000;
+  padding:15px 25px;
+  border-radius:12px;
+  font-size:20px;
+  font-weight:bold;
+  display:none;
+  z-index:9999;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
+  animation: pop 0.6s ease;
+  }
+  
+  @keyframes pop{
+  0%{transform:translate(-50%,-50%) scale(0.5); opacity:0;}
+  100%{transform:translate(-50%,-50%) scale(1); opacity:1;}
+  }
+  .badge{
+  padding:6px 12px;
+  border-radius:20px;
+  font-weight:bold;
+  font-size:14px;
+  margin-left:8px;
+  display:inline-block;
+  }
+  
+  /* Bronze (Level 1–3) */
+  .bronze{
+  background:#cd7f32;
+  color:#fff;
+  }
+  
+  /* Silver (Level 4–6) */
+  .silver{
+  background:#c0c0c0;
+  color:#000;
+  }
+  
+  /* Gold (Level 7+) */
+  .gold{
+  background:linear-gradient(45deg,#f7d774,#f1c40f);
+  color:#000;
+  }	
+  button{  
+    border:none; 
+    background:var(--primary); 
+    color:#fff; 
+    cursor:pointer; 
+    font-weight:600;  
+    box-shadow: 0 3px 14px rgba(25,118,210,.25);  
+    transition: transform .12s ease, filter .12s ease;  
+  }  
+  button:hover{ 
+  transform: translateY(-1px); filter: brightness(1.05); 
+  }  
+  button.ghost{ 
+  background:transparent; color:var(--primary); border:1px solid var(--primary); 
+  }  
+  
+  table{  
+    width:100%; 
+    border-collapse:collapse; 
+    overflow:hidden; 
+    border-radius:12px;  
+  }  
+  th, td{ 
+  padding:10px; 
+  text-align:center; 
+  border-bottom:1px solid #e5e7eb; 
+  }  
+  thead th{ 
+  background:var(--primary); 
+  color:#fff; 
+  border:none; 
+  }  
+  tbody tr:nth-child(odd) td{ 
+  background: rgba(66,165,245,.08); 
+  }  
+  .muted{ 
+  color:var(--muted); 
+  }  
+  
+  /* Tabs (bottom nav) */  
+  .tabs{  
+    position:fixed; 
+    bottom:0; 
+    left:0; 
+    right:0; 
+    background:var(--card);  
+    border-top:1px solid rgba(0,0,0,.08); display:flex; gap:6px; padding:6px;  
+  }  
+  .tab-btn{ 
+  flex:1; 
+  display:flex; 
+  flex-direction:column; 
+  gap:4px; 
+  align-items:center; 
+  justify-content:center; 
+  padding:8px 4px; 
+  font-size:12px; 
+  color:var(--muted); 
+  background:transparent; 
+  border:none; 
+  }  
+  .tab-btn.active{ 
+  color:var(--primary); 
+  font-weight:700; 
+  }  
+  
+  /* Hide sections by default */  
+  .page{ display:none; }  
+  .page.active{ display:block; }  
+  
+  /* Quiz buttons grid */  
+  .grid{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; 
+  }  
+  
+  /* Modal */  
+  .modal{ position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; padding:16px; }  
+  .modal.show{ display:flex; }  
+  .modal .box{ background:var(--card); color:var(--fg); border-radius:14px; padding:16px; width:min(460px, 100%); border:1px solid rgba(0,0,0,.08); }  
+  
+  /* AI chat */  
+  .chat{  
+    display:flex; flex-direction:column; gap:10px; max-height:48vh; overflow:auto; padding:6px;  
+    background:rgba(148,163,184,.12); border-radius:12px;  
+  }  
+  .msg{ padding:10px 12px; border-radius:12px; max-width:85%; width:fit-content; }  
+  .me{ background:var(--primary); color:#fff; margin-left:auto; }  
+  .bot{ background:var(--card); border:1px solid rgba(0,0,0,.06); }  
+  
+  @media (min-width:900px){  
+    .two-col{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }  
+  }  
+  /* Emoji Rain Animation */
+  @keyframes fall{
+  to{ transform: translateY(100vh) rotate(360deg); opacity:0; }
+  }
+  @keyframes pop{
+  0%{transform:translate(-50%,-50%) scale(0.5); opacity:0;}
+  50%{transform:translate(-50%,-50%) scale(1.3)}
+  100%{transform:translate(-50%,-50%) scale(1)}
+  }
+  
+  
+  
+  
+  
+  @keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+  }
+  
+  @keyframes bounce {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  }
+  
+  .correct { 
+  animation: bounce 0.3s; 
+  background: #4ade80 !important; 
+  color: white !important;
+  border-color: #22c55e !important;
+  }
+  
+  .wrong { 
+  animation: shake 0.3s; 
+  background: #f87171 !important; 
+  color: white !important;
+  border-color: #ef4444 !important;
+  }
+  <style>
+  body {
+  transition: background 0.5s ease; /* स्मूथ कलर चेंज */
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  }
+  
+  /* थीम बटन का स्टाइल */
+  .theme-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid white;
+  cursor: pointer;
+  transition: transform 0.2s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+  
+  .theme-btn:hover {
+  transform: scale(1.2);
+  }
+  
+  .theme-btn.active {
+  border-color: #fff;
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.5);
+  }
+  
+  #themeContainer {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 15px 0;
+  }
+    
+    
+    .font-btn.active {
+    border-color: #667eea!important;
+    background: linear-gradient(135deg, #667eea, #764ba2)!important;
+    color: white!important;
+    }
+    
+    body.font-small { font-size: 14px; }
+    body.font-small #question { font-size: 32px!important; }
+    body.font-small #options button { font-size: 22px!important; }
+    
+    body.font-medium { font-size: 16px; }
+    body.font-medium #question { font-size: 42px!important; }
+    body.font-medium #options button { font-size: 26px!important; }
+    
+    body.font-large { font-size: 18px; }
+    body.font-large #question { font-size: 48px!important; }
+    body.font-large #options button { font-size: 30px!important; }
+  </style>
+
+</style>  </head>  
+<body>  
+<header>HisabChamp</header>
+  <!-- HOME -->  
+  <section id="page-home" class="page active">  
+    <div class="card">  
+      <h2 id="t_home_title">Table Generator</h2>  
+      <div class="row">  
+        <input type="number" id="inNum" min="1" value="5" aria-label="Number" />  
+        <select id="inLimit" aria-label="Limit">  
+          <option value="10">10</option>  
+          <option value="20">20</option>  
+          <option value="50">50</option>  
+          <option value="100">100</option>  
+          <option value="500">500</option>  
+          <option value="1000">1000</option>  
+        </select>  
+        <button id="btnGen">📋 <span id="t_generate">Generate</span></button>  
+        <button id="btnPdf">📄 PDF</button>  
+        <button id="btnTheme">🌙 <span id="t_theme">Dark/Light</span></button>  
+      </div>  
+      <p class="muted" id="t_hint_pdf">Only the table below is exported to PDF.</p>  
+      <div id="tableWrap" class="card" style="padding:0; margin-top:12px;">  
+        <!-- table renders here -->  
+      </div>  
+    </div>  
+    <div class="card">
+    <h2 id="t_quick_practice">Choose Subject</h2>
+    <div class="grid">
+    <button class="ghost" data-subject="math">🔢 Math</button>
+    <button class="ghost" data-subject="english">📚 English</button>
+    <button class="ghost" data-subject="hindi">🇮🇳 Hindi</button>
+    <button class="ghost" data-subject="science">🔬 Science</button>
+    </div>
+    <p class="muted" style="margin-top:8px" id="t_quick_note">Select a subject to start quiz</p>
+    </div>
+  <p class="muted" style="margin-top:8px" id="t_quick_note">Use Quiz tab for full game mode.</p>  
+</div>
+
+  </section>    <!-- QUIZ -->    <section id="page-quiz" class="page">  
+    <div class="two-col">  
+      <div class="card">  
+        <h2>🎮 <span id="t_quiz_title">Quiz</span></h2>  
+        <div class="row">  
+          <button class="ghost" data-quiz="add">➕ Add</button>  
+          <button class="ghost" data-quiz="sub">➖ Sub</button>  
+          <button class="ghost" data-quiz="mul">✖ Mul</button>  
+          <button class="ghost" data-quiz="div">➗ Div</button>  
+          <select id="selQuestionType">
+          <optgroup label="Number">
+          <option value="number">🔢 6+7</option>
+          </optgroup>
+          <optgroup label="Animal">
+          <option value="animal">🐅 जानवर</option>
+          <option value="animal">🐆 जानवर</option>
+          <option value="animal">🐄 जानवर</option>
+          <option value="animal">🐃जानवर</option>
+          </optgroup>
+          <optgroup label="Fruits">
+          <option value="fruit">🍓 फल</option>
+          <option value="fruit">🍎 फल</option>
+          <option value="fruit">🍊 फल</option>
+          <option value="fruit">🥭 फल</option>
+          </optgroup>
+          <optgroup label="Birds">
+          <option value="bird">🦚 पक्षी</option>
+          <option value="bird">🦜 पक्षी</option>
+          <option value="bird">🦢 पक्षी</option>
+          <option value="bird">🦃 पक्षी</option>
+          </optgroup>
+          </select>
+          <select id="selTimer" title="Timer">  
+            <option value="5">5s</option>  
+            <option value="7" selected>7s</option>  
+            <option value="10">10s</option>  
+            <option value="15">15s</option>  
+          </select>  
+        </div>  
+        <div id="quizBox" class="card">  
+          <!-- question + options -->  
+          <div id="question" style="font-size:22px; font-weight:700; margin-bottom:10px;"></div>  
+          <div id="options" class="row"></div>  
+          <div style="margin-top:10px;">  
+            <div style="height:8px; background:#e5e7eb; border-radius:8px; overflow:hidden;">  
+              <div id="bar" style="height:8px; width:100%; background:linear-gradient(90deg,#22c55e,#ef4444); transition:width 1s linear;"></div>  
+            </div>  
+          </div>  
+        </div>  
+        <div class="row">  
+          <span id="scoreTxt">Score: 0</span>  
+          <span id="livesTxt" class="muted">Lives: 0</span>  
+          <span id="levelBadge" class="badge bronze">🥉 Level 1</span>
+          <span id="streakTxt">🔥 Streak: 0</span>
+        </div>  
+      </div>  <div class="card">  
+    <h2>🏆 <span id="t_leaderboard">Leaderboard</span></h2>  
+    <ol id="lb"></ol>  
+    <h2>🏅 Achievements</h2>
+    <ul id="achList"></ul>
+    <button id="btnResetScores" class="ghost">♻ Reset Scores</button>  
+  </div>  
+</div>
+<footer style="text-align:center; padding:10px; font-size:14px; background: linear-gradient(135deg, #fc466b, #3f5efb); color:white;">
+  Design by Amit Verma
+</footer>
+<div id="levelUpPopup" class="level-popup">🎉 Level Up!</div>
+  </section>
+      <!-- SETTINGS -->    <section id="page-settings" class="page">  
+    
+    <div class="card">  
+      <h2>⚙ Settings</h2>  
+     <div style="display:flex;align-items:center;gap:10px;margin-bottom:15px;">
+     <div style="display:flex;align-items:center;gap:5px;min-width:80px;">
+     <span style="font-size:18px;">🔤</span>
+     <span style="font-weight:600;font-size:14px;">साइज़:</span>
+     </div>
+     
+     <div style="display:flex;gap:8px;flex:1;">
+     <button onclick="changeFontSize('small')" class="font-btn" style="flex:1;padding:10px;border:2px solid #e0e0e0;border-radius:10px;background:linear-gradient(135deg,#667eea,#764ba2);font-weight:700;cursor:pointer;font-size:14px;">A-</button>
+     <button onclick="changeFontSize('medium')" class="font-btn active" style="flex:1;padding:10px;border:2px solid #667eea;border-radius:10px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;font-weight:700;cursor:pointer;font-size:16px;">A</button>
+     <button onclick="changeFontSize('large')" class="font-btn" style="flex:1;padding:10px;border:2px solid #e0e0e0;border-radius:10px;background:linear-gradient(135deg,#667eea,#764ba2);font-weight:700;cursor:pointer;font-size:18px;">A+</button>
+     </div>
+     </div>
+      <div class="row" style="align-items:center">  
+        <label for="selLang">🌐 Language</label>  
+        <select id="selLang">
+        <option value="en">English</option>
+        <option value="hi">हिंदी</option>
+        <option value="pa">ਪੰਜਾਬੀ</option>
+        <option value="bn">বাংলা</option>
+        <option value="gu">ગુજરાતી</option>
+        <option value="ta">தமிழ்</option>
+        <option value="te">తెలుగు</option>
+        </select>
+        <button id="btnToggleTheme" class="ghost">🌙 Toggle Theme</button>  
+      </div>  
+      <div id="themeContainer">
+      <button class="theme-btn active" style="background:linear-gradient(135deg, #667eea, #764ba2)" onclick="changeTheme('purple')" title="बैंगनी"></button>
+      <button class="theme-btn" style="background:linear-gradient(135deg, #f093fb, #f5576c)" onclick="changeTheme('sunset')" title="सनसेट"></button>
+      <button class="theme-btn" style="background:linear-gradient(135deg, #4facfe, #00f2fe)" onclick="changeTheme('ocean')" title="ओशन"></button>
+      <button class="theme-btn" style="background:linear-gradient(135deg, #43e97b, #38f9d7)" onclick="changeTheme('forest')" title="फॉरेस्ट"></button>
+      <button class="theme-btn" style="background:linear-gradient(135deg, #fa709a, #fee140)" onclick="changeTheme('fire')" title="फायर"></button>
+      </div>
+      <div class="row" style="margin-top:8px">  
+        <button id="btnReset" class="ghost">🧹 Clear All Data</button>  
+       </div>  
+      <div class="row" style="margin-top:8px">  
+      <button id="btnClearAchievements" class="ghost">🏅 Clear Achievements</button>  
+      </div>
+      <div class="row" style="margin-top:10px">
+      <label>🎮 Quiz Difficulty</label>
+      <select id="rangeSelect">
+      <option value="10">Easy (1–10)</option>
+      <option value="20">Medium (1–20)</option>
+      <option value="50">Hard (1–50)</option>
+      <option value="100">Pro (1–100)</option>
+      </select>
+ 
+      </div>
+      <div class="row" style="margin-top:10px">
+      <label>⏱ Quiz Timer: <span id="timerVal">7</span> sec</label>
+      <input type="range" id="timerRange" min="3" max="15" value="7">
+      </div>
+      <div class="row" style="margin-top:10px">
+      <label>💬 Feedback</label>
+      <textarea id="feedbackText" placeholder="Write your feedback..." rows="3"></textarea>
+      </div>
+      
+      <div class="row">
+      <button id="btnSendFeedback" class="ghost">📩 Send Feedback</button>
+      </div>
+      
+      <p class="muted" style="margin-top:6px" id="t_settings_hint">  
+        Your preferences are saved on this device.  
+      </p>  
+    </div>  
+    <div class="row" style="margin-top:10px">
+    <button id="btnShareApp" class="ghost" style="flex:1;background:linear-gradient(135deg,#25D366,#128C7E);color:white;border:none;">
+    📱 WhatsApp पर शेयर करें
+    </button>
+    </div>
+    
+    <div class="row" style="margin-top:10px">
+    <button id="btnRateApp" class="ghost" style="flex:1;background:linear-gradient(135deg,#FFD700,#FFA500);color:white;border:none;">
+    ⭐ ऐप को रेट करें
+    </button>
+    </div>
+  </section>   
+   <!-- AI -->    <section id="page-ai" class="page">  
+    <div class="card">  
+      <h2>🤖 Ask AI</h2>  
+      <div class="chat" id="chat"></div>  
+      <div class="row" style="margin-top:8px">  
+        <input id="aiInput" placeholder="Ask a math question or say hello…" style="flex:1" />  
+        <button id="aiSend">Send</button>  
+      </div>  
+     
+    
+    <audio id="levelUpSound" src="assets/sounds/level-up.mp3"></audio>
+    <footer style="text-align:center; padding:10px; font-size:14px; background: linear-gradient(135deg, #fc466b, #3f5efb); color:white;">
+    Design by Amit Verma
+    </footer>
+  </section>  
+  <!-- ✅ PARENT DASHBOARD (ALAG रखा) -->
+  <section id="page-parent" class="page">
+  <div class="card">
+  <h2>📊 Parent Dashboard</h2>
+  <p class="muted">पिछले 7 दिन की रिपोर्ट</p>
+  
+  <div class="two-col">
+  <div class="card">
+  <h3>टॉपिक वाइज़ परफॉर्मेंस</h3>
+  <canvas id="topicChart"></canvas>
+  </div>
+  
+  <div class="card">
+  <h3>डेली प्रैक्टिस</h3>
+  <canvas id="dailyChart"></canvas>
+  </div>
+  </div>
+  
+  <div class="card">
+  <h3>🔍 कमजोर टॉपिक</h3>
+  <div id="weakTopics">डेटा लोड हो रहा है...</div>
+  
+  <h3 style="margin-top:16px">🏅 सबसे अच्छा टॉपिक</h3>
+  <div id="strongTopics"></div>
+  </div>
+  
+  <div class="row">
+  <button id="btnExportReport" class="ghost">📄 रिपोर्ट PDF डाउनलोड</button>
+  <button id="btnShareWhatsapp" class="ghost">📱 WhatsApp पर भेजें</button>
+  </div>
+  </div>
+  </section>
+  
+  
+  
+  <!-- body में कहीं जोड़ो -->
+  <canvas id="confettiCanvas" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none;"></canvas>
+</div>  <!-- Bottom Tabs -->  <nav class="tabs" role="tablist" aria-label="Main navigation">  
+  <button class="tab-btn active" data-tab="home">🏠<span>Home</span></button>  
+  <button class="tab-btn" data-tab="quiz">🎮<span>Quiz</span></button>  
+  <button class="tab-btn" data-tab="settings">⚙️<span>Settings</span></button>  
+  <button class="tab-btn" data-tab="ai">🤖<span>Ask AI</span></button>  
+  <button class="tab-btn" data-tab="parent">👨‍👩‍👧<span>Parents</span></button>
+</nav> 
+ <!-- jsPDF (for PDF export) -->  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>  <script>  
+/* -------------------  
+   UTIL + STATE  
+--------------------*/  
+
+const $ = sel => document.querySelector(sel);  
+const $$ = sel => document.querySelectorAll(sel);  
+  
+const state = {
+  lang: localStorage.getItem('lang') || 'en',
+  theme: localStorage.getItem('theme') || 'light',
+  timerSec: parseInt(localStorage.getItem('timer')||'7',10),
+  lives: 0,
+  score: 0,
+  mode: 'mul',
+  highScores: JSON.parse(localStorage.getItem('highScores')||'[]'),
+  achievements: JSON.parse(localStorage.getItem('achievements') || '[]'),
+  streak: 0,
+  xp: 0,
+  level: 1,
+  correct: 0,
+  wrong: 0,
+  bestStreak: 0,
+  // ✅ ये जोड़ो
+  stats: JSON.parse(localStorage.getItem('mathStats') || '{"add":{"correct":0,"total":0},"sub":{"correct":0,"total":0},"mul":{"correct":0,"total":0},"div":{"correct":0,"total":0}}')
+};
+
+// ✅ ये 2 लाइन यहाँ पेस्ट करो
+let currentSubject = 'math';
+let currentTopic = 'add';
+const tablesDB = {
+  english: [
+    {letter:'A', word:'Apple', emoji:'🍎'}, {letter:'B', word:'Ball', emoji:'⚽'},
+    {letter:'C', word:'Cat', emoji:'🐱'}, {letter:'D', word:'Dog', emoji:'🐶'},
+    {letter:'E', word:'Elephant', emoji:'🐘'}, {letter:'F', word:'Fish', emoji:'🐟'},
+    {letter:'G', word:'Grapes', emoji:'🍇'}, {letter:'H', word:'Hen', emoji:'🐔'},
+    {letter:'I', word:'Ice', emoji:'🧊'}, {letter:'J', word:'Jug', emoji:'🫗'},
+    {letter:'K', word:'Kite', emoji:'🪁'}, {letter:'L', word:'Lion', emoji:'🦁'},
+    {letter:'M', word:'Mango', emoji:'🥭'}, {letter:'N', word:'Nest', emoji:'🪺'},
+    {letter:'O', word:'Orange', emoji:'🍊'}, {letter:'P', word:'Parrot', emoji:'🦜'},
+    {letter:'Q', word:'Queen', emoji:'👸'}, {letter:'R', word:'Rabbit', emoji:'🐰'},
+    {letter:'S', word:'Sun', emoji:'☀️'}, {letter:'T', word:'Tiger', emoji:'🐅'},
+    {letter:'U', word:'Umbrella', emoji:'☂️'}, {letter:'V', word:'Van', emoji:'🚐'},
+    {letter:'W', word:'Watch', emoji:'⌚'}, {letter:'X', word:'Xmas', emoji:'🎄'},
+    {letter:'Y', word:'Yak', emoji:'🦬'}, {letter:'Z', word:'Zebra', emoji:'🦓'}
+  ],
+  hindi: [
+    {letter:'अ', word:'अनार', emoji:'🍎'}, {letter:'आ', word:'आम', emoji:'🥭'},
+    {letter:'इ', word:'इमली', emoji:'🫘'}, {letter:'ई', word:'ईख', emoji:'🎋'},
+    {letter:'उ', word:'उल्लू', emoji:'🦉'}, {letter:'ऊ', word:'ऊन', emoji:'🧶'},
+    {letter:'ए', word:'एड़ी', emoji:'🦶'}, {letter:'ऐ', word:'ऐनक', emoji:'👓'},
+    {letter:'ओ', word:'ओखली', emoji:'🪵'}, {letter:'औ', word:'औरत', emoji:'👩'},
+    {letter:'क', word:'केला', emoji:'🍌'}, {letter:'ख', word:'खरगोश', emoji:'🐰'},
+    {letter:'ग', word:'गाय', emoji:'🐄'}, {letter:'घ', word:'घड़ी', emoji:'⌚'},
+    {letter:'च', word:'चिड़िया', emoji:'🐦'}, {letter:'छ', word:'छतरी', emoji:'☂️'},
+    {letter:'ज', word:'जहाज', emoji:'🚢'}, {letter:'झ', word:'झंडा', emoji:'🚩'},
+    {letter:'ट', word:'टमाटर', emoji:'🍅'}, {letter:'ठ', word:'ठठेरा', emoji:'🔨'},
+    {letter:'ड', word:'डमरू', emoji:'🪘'}, {letter:'ढ', word:'ढोल', emoji:'🥁'},
+    {letter:'त', word:'तरबूज', emoji:'🍉'}, {letter:'थ', word:'थरमस', emoji:'🫖'},
+    {letter:'द', word:'दवात', emoji:'🖋️'}, {letter:'ध', word:'धनुष', emoji:'🏹'},
+    {letter:'न', word:'नल', emoji:'🚰'}, {letter:'प', word:'पतंग', emoji:'🪁'},
+    {letter:'फ', word:'फल', emoji:'🍓'}, {letter:'ब', word:'बकरी', emoji:'🐐'},
+    {letter:'भ', word:'भालू', emoji:'🐻'}, {letter:'म', word:'मछली', emoji:'🐟'},
+    {letter:'य', word:'यज्ञ', emoji:'🔥'}, {letter:'र', word:'रथ', emoji:'🏇'},
+    {letter:'ल', word:'लट्टू', emoji:'🪀'}, {letter:'व', word:'वायुयान', emoji:'✈️'},
+    {letter:'श', word:'शेर', emoji:'🦁'}, {letter:'ष', word:'षट्कोण', emoji:'⬡'},
+    {letter:'स', word:'सूरज', emoji:'☀️'}, {letter:'ह', word:'हाथी', emoji:'🐘'},
+    {letter:'क्ष', word:'क्षत्रिय', emoji:'⚔️'}, {letter:'त्र', word:'त्रिशूल', emoji:'🔱'},
+    {letter:'ज्ञ', word:'ज्ञानी', emoji:'🧠'}
+  ]
+};
+
+const questionDB = {
+  english: [
+    {q:'Apple - 🍎?', opts:['🍎 Apple','🍓 Strawberry','🍊 Orange','🥭 Mango'], ans:0},
+    {q:'Mango - 🥭?', opts:['🍎 Apple','🍓 Strawberry','🥭 Mango','🍊 Orange'], ans:2},
+    {q:'Cat - 🐱?', opts:['🐶 Dog','🐱 Cat','🐄 Cow','🐅 Tiger'], ans:1},
+    {q:'Dog - 🐶?', opts:['🐶 Dog','🐱 Cat','🐄 Cow','🐘 Elephant'], ans:0},
+    {q:'Sun - ☀️?', opts:['🌙 Moon','⭐ Star','☀️ Sun','☁️ Cloud'], ans:2},
+    {q:'Book - 📚?', opts:['✏️ Pencil','📚 Book','📝 Paper','🖊️ Pen'], ans:1}
+  ],
+  hindi: [
+    {q:'अ - अनार 🍎?', opts:['🥭 आम','🍎 अनार','🍓 स्ट्रॉबेरी','🍊 संतरा'], ans:1},
+    {q:'आ - आम 🥭?', opts:['🥭 आम','🍎 सेब','🍌 केला','🍇 अंगूर'], ans:0},
+    {q:'इ - इमली?', opts:['🌶️ मिर्च','🥭 आम','🍋 नींबू','🫘 इमली'], ans:3},
+    {q:'क - केला 🍌?', opts:['🍌 केला','🍎 सेब','🥭 आम','🍊 संतरा'], ans:0},
+    {q:'ग - गाय 🐄?', opts:['🐄 गाय','🐘 हाथी','🐅 बाघ','🐴 घोड़ा'], ans:0}
+  ],
+  science: [
+    {q:'पानी का फॉर्मूला?', opts:['H2O','CO2','O2','NaCl'], ans:0},
+    {q:'सूरज क्या है?', opts:['ग्रह','तारा','उपग्रह','धूमकेतु'], ans:1},
+    {q:'इंसान के दांत?', opts:['28','30','32','34'], ans:2},
+    {q:'पृथ्वी का उपग्रह?', opts:['सूरज','चाँद','मंगल','शुक्र'], ans:1},
+    {q:'ऑक्सीजन?', opts:['O','Ox','O2','Og'], ans:0}
+  ]
+};
+
+// i18n strings  
+const i18n = {  
+  en: {  
+    tableGenerator: "Table Generator",  
+    generate: "Generate",  
+    theme: "Dark/Light",  
+    pdfHint: "Only the table below is exported to PDF.",  
+    quickPractice: "Quick Practice",  
+    quickNote: "Use Quiz tab for full game mode.",  
+    quiz: "Quiz",  
+    leaderboard: "Leaderboard",  
+    settingsHint: "Your preferences are saved on this device.",  
+    tableOf: n => `Table of ${n}`  
+  },  
+  hi: {  
+    tableGenerator: "टेबल जनरेटर",  
+    generate: "बनाएँ",  
+    theme: "डार्क/लाइट",  
+    pdfHint: "नीचे वाला टेबल ही PDF में सेव होगा।",  
+    quickPractice: "त्वरित अभ्यास",  
+    quickNote: "पूरा गेम मोड के लिए Quiz टैब उपयोग करें।",  
+    quiz: "क्विज़",  
+    leaderboard: "लीडरबोर्ड",  
+    settingsHint: "आपकी सेटिंग्स इसी डिवाइस पर सेव होती हैं।",  
+    tableOf: n => `${n} का टेबल`  
+  },
+  pa: {
+  tableGenerator: "ਟੇਬਲ ਜਨਰੇਟਰ",
+  generate: "ਬਣਾਓ",
+  theme: "ਡਾਰਕ/ਲਾਈਟ",
+  pdfHint: "ਹੇਠਾਂ ਵਾਲਾ ਟੇਬਲ ਹੀ PDF ਵਿੱਚ ਜਾਵੇਗਾ।",
+  quickPractice: "ਤੇਜ਼ ਅਭਿਆਸ",
+  quickNote: "ਪੂਰਾ ਗੇਮ ਮੋਡ ਲਈ Quiz ਟੈਬ ਵਰਤੋ।",
+  quiz: "ਕੁਇਜ਼",
+  leaderboard: "ਲੀਡਰਬੋਰਡ",
+  settingsHint: "ਤੁਹਾਡੀਆਂ ਸੈਟਿੰਗਾਂ ਇਸ ਡਿਵਾਈਸ 'ਤੇ ਸੇਵ ਹਨ।",
+  tableOf: n => `${n} ਦਾ ਟੇਬਲ`
+  },
+  
+  mr: {
+  tableGenerator: "टेबल जनरेटर",
+  generate: "तयार करा",
+  theme: "डार्क/लाइट",
+  pdfHint: "खालील टेबलच PDF मध्ये जाईल.",
+  quickPractice: "जलद सराव",
+  quickNote: "पूर्ण गेमसाठी Quiz टॅब वापरा.",
+  quiz: "क्विझ",
+  leaderboard: "लीडरबोर्ड",
+  settingsHint: "तुमच्या सेटिंग्स या डिव्हाइसवर सेव आहेत.",
+  tableOf: n => `${n} चा टेबल`
+  },
+  bn: {  
+  tableGenerator: "টেবিল জেনারেটর",  
+  generate: "তৈরি করুন",  
+  theme: "ডার্ক/লাইট",  
+  pdfHint: "শুধুমাত্র নিচের টেবিলটি PDF এ যাবে।",  
+  quickPractice: "দ্রুত অনুশীলন",  
+  quickNote: "সম্পূর্ণ গেমের জন্য Quiz ট্যাব ব্যবহার করুন।",  
+  quiz: "কুইজ",  
+  leaderboard: "লিডারবোর্ড",  
+  settingsHint: "আপনার সেটিংস এই ডিভাইসে সংরক্ষিত।",  
+  tableOf: n => `${n} এর নামতা`  
+  },
+  
+  gu: {  
+  tableGenerator: "ટેબલ જનરેટર",  
+  generate: "બનાવો",  
+  theme: "ડાર્ક/લાઇટ",  
+  pdfHint: "માત્ર નીચેનું ટેબલ PDF માં જશે.",  
+  quickPractice: "ઝડપી પ્રેક્ટિસ",  
+  quickNote: "પૂર્ણ ગેમ માટે Quiz ટેબનો ઉપયોગ કરો.",  
+  quiz: "ક્વિઝ",  
+  leaderboard: "લીડરબોર્ડ",  
+  settingsHint: "તમારી સેટિંગ્સ આ ડિવાઇસ પર સેવ છે.",  
+  tableOf: n => `${n} નું ટેબલ`  
+  },
+  
+  ta: {  
+  tableGenerator: "அட்டவணை உருவாக்கி",  
+  generate: "உருவாக்கு",  
+  theme: "டார்க்/லைட்",  
+  pdfHint: "கீழே உள்ள அட்டவணை மட்டும் PDF ஆகும்.",  
+  quickPractice: "விரைவு பயிற்சி",  
+  quickNote: "முழு கேம் மோடுக்கு Quiz தாவலை பயன்படுத்தவும்.",  
+  quiz: "வினாடி வினா",  
+  leaderboard: "லீடர்போர்டு",  
+  settingsHint: "உங்கள் அமைப்புகள் இந்த சாதனத்தில் சேமிக்கப்படும்.",  
+  tableOf: n => `${n} அட்டவணை`  
+  },
+  
+  te: {  
+  tableGenerator: "పట్టిక జనరేటర్",  
+  generate: "సృష్టించు",  
+  theme: "డార్క్/లైట్",  
+  pdfHint: "కింద ఉన్న పట్టిక మాత్రమే PDF లోకి వెళ్తుంది.",  
+  quickPractice: "త్వరిత సాధన",  
+  quickNote: "పూర్తి గేమ్ కోసం Quiz ట్యాబ్ ఉపయోగించండి.",  
+  quiz: "క్విజ్",  
+  leaderboard: "లీడర్‌బోర్డ్",  
+  settingsHint: "మీ సెట్టింగులు ఈ పరికరంలో సేవ్ అవుతాయి.",  
+  tableOf: n => `${n} పట్టిక`  
+  }
+};  
+  
+function applyLang(){  
+  const t = i18n[state.lang];  
+  $('#t_home_title').textContent = t.tableGenerator;  
+  $('#t_generate').textContent = t.generate;  
+  $('#t_theme').textContent = t.theme;  
+  $('#t_hint_pdf').textContent = t.pdfHint;  
+  $('#t_quick_practice').textContent = t.quickPractice;  
+  $('#t_quick_note').textContent = t.quickNote;  
+  $('#t_quiz_title').textContent = t.quiz;  
+  $('#t_leaderboard').textContent = t.leaderboard;  
+  $('#t_settings_hint').textContent = t.settingsHint;  
+  $('#selLang').value = state.lang;  
+}  
+function applyTheme(){  
+  if(state.theme==='dark'){ document.body.classList.add('dark'); }  
+  else { document.body.classList.remove('dark'); }  
+}  
+applyLang(); applyTheme();  
+  
+/* -------------------  
+   NAV / TABS  
+--------------------*/  
+$$('.tab-btn').forEach(btn=>{  
+  btn.addEventListener('click', ()=>{  
+    $$('.tab-btn').forEach(b=>b.classList.remove('active'));  
+    btn.classList.add('active');  
+    const tab = btn.dataset.tab;  
+    $$('.page').forEach(p=>p.classList.remove('active'));  
+    $('#page-'+tab).classList.add('active');  
+  });  
+});  
+  
+/* -------------------  
+   TABLE GENERATOR + PDF  
+--------------------*/  
+function renderTable(n, limit){  
+  const t = i18n[state.lang];  
+  let html = `  
+    <table>  
+      <thead><tr><th colspan="3">${t.tableOf(n)}</th></tr></thead>  
+      <tbody>  
+  `;  
+  for(let i=1;i<=limit;i++){  
+    html += `<tr><td>${n}</td><td>× ${i}</td><td>= ${n*i}</td></tr>`;  
+  }  
+  html += `</tbody></table>`;  
+  $('#tableWrap').innerHTML = html;  
+}  
+$('#btnGen').addEventListener('click', ()=>{  
+  const n = parseInt($('#inNum').value||'0',10);  
+  const limit = parseInt($('#inLimit').value||'10',10);  
+  if(n<=0){ alert('Enter a valid number'); return; }  
+  renderTable(n, limit);  
+});  
+  
+// PDF without external html2canvas (text-mode)  
+$('#btnPdf').addEventListener('click', ()=>{  
+  const table = $('#tableWrap table');  
+  if(!table){ alert('Generate a table first.'); return; }  
+  const { jsPDF } = window.jspdf || {};  
+  if(!jsPDF){ alert('PDF engine not loaded yet. Try again.'); return; }  
+  const doc = new jsPDF({ unit:'pt', format:'a4' });  
+  let y = 40, left = 40;  
+  doc.setFont('helvetica','bold'); doc.setFontSize(14);  
+  doc.text(table.querySelector('th').innerText, left, y); y+=18;  
+  doc.setFont('helvetica','normal'); doc.setFontSize(12);  
+  table.querySelectorAll('tbody tr').forEach((tr, idx)=>{  
+    const tds = tr.querySelectorAll('td');  
+    const line = `${tds[0].innerText}    × ${tds[1].innerText.replace('× ','')}    = ${tds[2].innerText.replace('= ','')}`;  
+    doc.text(line, left, y);  
+    y += 18;  
+    // new page if near bottom  
+    if(y > 790){ doc.addPage(); y = 40; }  
+  });  
+  doc.save('table.pdf');  
+});  
+  
+/* Quick practice buttons on Home → start quiz page with mode */  
+$$('[data-quiz]').forEach(b=>{  
+  b.addEventListener('click', ()=>{  
+    state.mode = b.dataset.quiz;  
+    // switch to quiz tab  
+    $$('.tab-btn').forEach(x=>x.classList.remove('active'));  
+    document.querySelector('[data-tab="quiz"]').classList.add('active');  
+    $$('.page').forEach(p=>p.classList.remove('active'));  
+    $('#page-quiz').classList.add('active');  
+    startQuiz();  
+  });  
+});  
+function updateLevel(){
+  state.level = Math.floor(state.xp / 100) + 1;
+
+  const badge = document.getElementById("levelBadge");
+  if(!badge) return;
+
+  badge.textContent = `🏆 Level ${state.level}`;
+
+  badge.classList.remove("bronze","silver","gold");
+
+  if(state.level <= 3){
+    badge.classList.add("bronze");
+  }
+  else if(state.level <= 6){
+    badge.classList.add("silver");
+  }
+  else{
+    badge.classList.add("gold");
+  }
+}
+let lastLevel = 1;
+
+function updateLevel(){
+  state.level = Math.floor(state.xp / 100) + 1;
+
+  const badge = document.getElementById("levelBadge");
+  if(badge){
+    badge.textContent = `🏆 Level ${state.level}`;
+
+    badge.classList.remove("bronze","silver","gold");
+
+    if(state.level <= 3){
+      badge.classList.add("bronze");
+    }
+    else if(state.level <= 6){
+      badge.classList.add("silver");
+    }
+    else{
+      badge.classList.add("gold");
+    }
+  }
+
+  // ⭐ LEVEL UP DETECTION
+  function showLevelUp(){
+  const pop = document.getElementById("levelUpPopup");
+  if(!pop) return;
+  
+  // 🎵 Play sound
+  const sound = document.getElementById("levelUpSound");
+  sound.currentTime = 0;  // start from beginning
+  sound.play();
+  
+  pop.style.display = "block";
+  
+  setTimeout(()=>{
+  pop.style.display = "none";
+  }, 1500);
+  }
+  if(state.level > lastLevel){
+    showLevelUp();
+    lastLevel = state.level;
+  }
+}
+
+function showLevelUp(){
+  const pop = document.getElementById("levelUpPopup");
+  if(!pop) return;
+
+  pop.style.display = "block";
+
+  setTimeout(()=>{
+    pop.style.display = "none";
+  }, 1500);
+}
+  
+/* -------------------  
+   QUIZ ENGINE  
+--------------------*/  
+
+let timerId = null;  
+
+function startQuiz(){  
+  state.score = 0;  
+  state.lives = 3;  
+  $('#scoreTxt').textContent = 'Score: 0';  
+  $('#livesTxt').textContent = 'Lives: 3';  
+  askQuestion();  
+}  
+
+// ✅ पूरा askQuestion() बदल दो
+function askQuestion(){
+  clearInterval(timerId);
+
+  let rangeEl = document.getElementById("rangeSelect");
+  let range = rangeEl? parseInt(rangeEl.value) : 10;
+
+  // MATH के लिए
+  if(currentSubject === 'math'){
+    let a = Math.floor(Math.random() * range) + 1;
+    let b = Math.floor(Math.random() * range) + 1;
+    if(a === b) b = (b + 1) % range + 1;
+
+    const mathOps = {
+      add: {q:`${a} + ${b} =?`, ans:a+b},
+      sub: {q:`${a<b?b:a} - ${a<b?a:b} =?`, ans:Math.abs(a-b)},
+      mul: {q:`${a} × ${b} =?`, ans:a*b},
+      div: {q:`${a*b} ÷ ${b} =?`, ans:a}
+    };
+
+    let q = mathOps[currentTopic].q;
+    let ans = mathOps[currentTopic].ans;
+
+    $('#question').textContent = q;
+
+    const opts = new Set();
+    opts.add(ans);
+    while(opts.size < 4){
+      let rand = Math.floor(Math.random() * (range * 2)) + 1;
+      if(rand!== ans) opts.add(rand);
+    }
+
+    const shuffled = Array.from(opts).sort(()=>Math.random()-0.5);
+    const box = $('#options');
+    box.innerHTML='';
+
+    shuffled.forEach(v=>{
+      const btn = document.createElement('button');
+      btn.textContent = v;
+      btn.addEventListener('click', ()=>checkAnswer(v, ans));
+      box.appendChild(btn);
+    });
+  }
+  // ENGLISH/HINDI/SCIENCE के लिए
+  else {
+    let questions = questionDB[currentSubject];
+    let randomQ = questions[Math.floor(Math.random() * questions.length)];
+
+    $('#question').textContent = randomQ.q;
+
+    const box = $('#options');
+    box.innerHTML='';
+
+    randomQ.opts.forEach((opt, idx)=>{
+      const btn = document.createElement('button');
+      btn.textContent = opt;
+      btn.addEventListener('click', ()=>checkAnswer(idx, randomQ.ans));
+      box.appendChild(btn);
+    });
+  }
+
+  // Timer
+  let left = 100;
+  $('#bar').style.width = '100%';
+  timerId = setInterval(()=>{
+    left -= (100/state.timerSec);
+    $('#bar').style.width = Math.max(0,left) + '%';
+    if(left<=0){ clearInterval(timerId); wrong(); }
+  }, 1000);
+}
+  
+  
+/* -------------------  
+   ANSWER SYSTEM  
+--------------------*/  
+// Emoji + आवाज़ वाला फंक्शन
+function celebrate(correct){
+  const emojis = correct 
+    ? ['🎉','⭐','🎊','🥳','🏆'] 
+    : ['💪','🌟','😊','🔄','✨'];
+
+  showEmojiRain(emojis);
+
+  if(correct){
+    speak("वाह! सुपर स्टार ⭐");
+  } else {
+    speak("कोई बात नहीं, फिर से कोशिश करो 💪");
+  }
+}
+
+function showEmojiRain(emojis){
+  for(let i=0; i<15; i++){
+    const div = document.createElement('div');
+    div.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+    
+    div.style.cssText = `
+      position:fixed;
+      top:-50px;
+      left:${Math.random()*100}%;
+      font-size:${40 + Math.random()*40}px;
+      animation: fall ${1 + Math.random()}s linear;
+      z-index:9999;
+      pointer-events:none;
+    `;
+    
+    document.body.appendChild(div);
+    setTimeout(()=>div.remove(), 2000);
+  }
+}
+
+function speak(text){
+  speechSynthesis.cancel();
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.lang = 'hi-IN';
+  msg.rate = 0.9;
+  msg.pitch = 1.2;
+  speechSynthesis.speak(msg);
+}
+
+// ⭐ आवाज़ प्ले करने का फंक्शन
+function playSound(emoji){
+  const sounds = {
+    // जानवर
+    '🐅': 'tiger.mp3', '🐆': 'leopard.mp3', '🐄': 'cow.mp3', '🐃': 'buffalo.mp3',
+    // फल - टिंग वाली आवाज़
+    '🍓':'ding.mp3', '🍎':'ding.mp3', '🍊':'ding.mp3', '🥭':'ding.mp3',
+    // पक्षी
+    '🦚':'peacock.mp3', '🦜':'parrot.mp3', '🦢':'swan.mp3', '🦃':'turkey.mp3'
+  };
+
+  const soundFile = sounds[emoji] || 'correct.mp3';
+
+  // अगर mp3 फाइल नहीं है तो browser से ही आवाज़ निकलवाओ
+  if(!soundFile.includes('.mp3')){
+    const msg = new SpeechSynthesisUtterance();
+    msg.text = emoji; // इमोजी का नाम बोलेगा
+    msg.lang = 'hi-IN';
+    msg.rate = 1.2;
+    speechSynthesis.speak(msg);
+  } else {
+    // mp3 फाइल है तो बजाओ
+    const audio = new Audio(soundFile);
+    audio.play().catch(()=>{}); // एरर इग्नोर करो
+  }
+}
+
+function checkAnswer(v, ans){
+  
+  clearInterval(timerId);
+
+  if(Number(v) === Number(ans)){
+    right();
+  } else {
+    wrong();
+  }
+}
+let soundOn = localStorage.getItem('mathQuizSound')!== 'off';
+
+function playSound(emoji){
+  if(!soundOn) return;
+  speechSynthesis.cancel();
+  const msg = new SpeechSynthesisUtterance();
+  msg.text = emoji;
+  msg.lang = 'hi-IN';
+  msg.rate = 1.2;
+  speechSynthesis.speak(msg);
+}
+
+function right(){
+  state.score++;
+  state.streak++;
+
+  state.xp += 10;     // ⭐ ADD THIS
+  updateLevel();      // ⭐ ADD THIS
+
+  $('#streakTxt').textContent = '🔥 Streak: ' + state.streak;
+  $('#scoreTxt').textContent = 'Score: ' + state.score;
+
+  checkAchievements();
+
+  askQuestion();
+}
+
+function wrong(){
+   state.lives--;
+   
+   // ❌ reset streak
+   state.streak = 0;
+   
+   $('#livesTxt').textContent = 'Lives: ' + state.lives;
+   $('#streakTxt').textContent = '🔥 Streak: 0';
+   
+   askQuestion();// 🔥 next question
+}
+
+/* -------------------  
+   CONTROLS  
+--------------------*/  
+
+$('#btnResetScores').addEventListener('click', ()=>{  
+  if(confirm('Reset leaderboard scores?')){  
+    state.highScores = [];  
+    localStorage.setItem('highScores','[]');  
+    renderLB();  
+  }  
+});
+function renderAchievements(){
+  const list = document.getElementById("achList");
+  if(!list) return;
+
+  list.innerHTML = "";
+
+  state.achievements.forEach(a=>{
+    let li = document.createElement("li");
+    li.textContent = a;
+    list.appendChild(li);
+  });
+}
+
+renderAchievements();
+function unlockAchievement(name){
+  if(!state.achievements.includes(name)){
+    state.achievements.push(name);
+
+    localStorage.setItem('achievements', JSON.stringify(state.achievements));
+
+    showModal("🏅 Achievement Unlocked: " + name);
+
+    renderAchievements();
+  }
+}
+function checkAchievements(){
+
+  if(state.score >= 5){
+    unlockAchievement("🎉 Good (5 correct)");
+  }
+  if(state.score >= 10){
+  unlockAchievement("🎖️ Very Good (10 correct)");
+  }
+  if(state.score >= 20){
+    unlockAchievement("🥈 Nice (20 correct)");
+  }
+  if(state.score >= 50){
+  unlockAchievement("🥇 Very Nice (50 correct)");
+  }
+  if(state.score >= 100){
+  unlockAchievement("🏆  Chamoion(100 correct)");
+  }
+  if(state.score >= 150){
+  unlockAchievement("🎓 Beginner (150 correct)");
+  }
+  if(state.score >= 200){
+  unlockAchievement("💍 Qune (200 correct)");
+  }
+  if(state.score >= 500){
+  unlockAchievement("👑 King (200 correct)");
+  }
+}
+  
+/* -------------------  
+   SETTINGS  
+--------------------*/  
+document.getElementById("btnSendFeedback").addEventListener("click", ()=>{
+
+  let msg = document.getElementById("feedbackText").value.trim();
+
+  if(!msg){
+    alert("Please write feedback first!");
+    return;
+  }
+
+  let feedbacks = JSON.parse(localStorage.getItem("feedbacks") || "[]");
+
+  feedbacks.push({
+    text: msg,
+    time: new Date().toLocaleString()
+  });
+
+  localStorage.setItem("feedbacks", JSON.stringify(feedbacks));
+
+  document.getElementById("feedbackText").value = "";
+
+  alert("Thanks for your feedback! 🙏");
+});document.getElementById("btnSendFeedback").addEventListener("click", ()=>{
+
+  let msg = document.getElementById("feedbackText").value.trim();
+
+  if(!msg){
+    alert("Please write feedback first!");
+    return;
+  }
+
+  let feedbacks = JSON.parse(localStorage.getItem("feedbacks") || "[]");
+
+  feedbacks.push({
+    text: msg,
+    time: new Date().toLocaleString()
+  });
+
+  localStorage.setItem("feedbacks", JSON.stringify(feedbacks));
+
+  document.getElementById("feedbackText").value = "";
+
+  alert("Thanks for your feedback! 🙏");
+});
+$('#selLang').value = state.lang;  
+
+$('#selLang').addEventListener('change', e=>{  
+  state.lang = e.target.value;  
+  localStorage.setItem('lang', state.lang);  
+  applyLang();  
+
+  const th = $('#tableWrap th'); 
+  if(th){  
+    const n = parseInt($('#inNum').value||'5',10);  
+    th.textContent = i18n[state.lang].tableOf(n);  
+  }  
+});  
+
+function toggleTheme(){  
+  state.theme = (state.theme==='dark'?'light':'dark');  
+  localStorage.setItem('theme', state.theme);  
+  applyTheme();  
+}  
+
+$('#btnToggleTheme').addEventListener('click', toggleTheme);  
+$('#btnTheme').addEventListener('click', toggleTheme);  
+
+$('#btnReset').addEventListener('click', ()=>{  
+  if(confirm('Clear all app data (scores, settings)?')){  
+    localStorage.clear();  
+    location.reload();  
+  }  
+});  
+
+
+// ✅ ⏱ TIMER RANGE (ALAG LIKHO — बाहर)
+let timerRange = document.getElementById("timerRange");
+let timerVal = document.getElementById("timerVal");
+
+if(timerRange && timerVal){
+
+  let savedTimer = localStorage.getItem("timer");
+  if(savedTimer){
+    timerRange.value = savedTimer;
+    state.timerSec = parseInt(savedTimer);
+  }
+
+  timerVal.textContent = timerRange.value;
+
+  timerRange.addEventListener("input", function(){
+    timerVal.textContent = this.value;
+    state.timerSec = parseInt(this.value);
+    localStorage.setItem("timer", this.value);
+  });
+
+}
+  
+/* -------------------  
+   AI (offline demo)  
+--------------------*/  
+function addMsg(text, who='bot'){  
+  const div = document.createElement('div');  
+  div.className = 'msg ' + (who==='me'?'me':'bot');  
+  div.textContent = text;  
+  $('#chat').appendChild(div);  
+  $('#chat').scrollTop = $('#chat').scrollHeight;  
+}  
+function evalExpr(s){  
+  // safe simple eval for + - * /  
+  if(!/^[\d\s+\-*/().%]+$/.test(s)) return null;  
+  try{  
+    // eslint-disable-next-line no-new-func  
+    const val = Function(`"use strict";return (${s})`)();  
+    if(typeof val==='number' && isFinite(val)) return val;  
+    return null;  
+  }catch(e){ return null; }  
+}  
+function aiReply(q){  
+  const lower = q.toLowerCase();  
+  const expr = evalExpr(lower.replace(/x/g,'*'));  
+  if(expr!==null) return `Result: ${expr}`;  
+  if(/hello|hi|namaste|namaskar/.test(lower)) return 'Hello! Ask me a math expression like "12*7" or "45/9".';  
+  if(/table of (\d+)/.test(lower)){ const n = +RegExp.$1; return `Table of ${n}: ` + Array.from({length:10},(_,i)=>`${n}×${i+1}=${n*(i+1)}`).join(', '); }  
+  if(/square of (\d+)/.test(lower)){ const n=+RegExp.$1; return `Square of ${n} is ${n*n}`; }  
+  if(/cube of (\d+)/.test(lower)){ const n=+RegExp.$1; return `Cube of ${n} is ${n*n*n}`; }  
+  return 'I can solve basic arithmetic. Try something like "120/8", "15+27", or ask "table of 9".';  
+}  
+$('#aiSend').addEventListener('click', ()=>{  
+  const v = $('#aiInput').value.trim();  
+  if(!v) return;  
+  addMsg(v,'me');  
+  setTimeout(()=> addMsg(aiReply(v),'bot'), 200);  
+  $('#aiInput').value='';  
+});  
+$('#aiInput').addEventListener('keydown', e=>{  
+  if(e.key==='Enter'){ $('#aiSend').click(); }  
+});  
+  
+/* -------------------  
+   MODAL  
+--------------------*/  
+function showModal(msg){  
+  let modal = $('#modal');  
+  if(!modal){  
+    modal = document.createElement('div');  
+    modal.id = 'modal'; modal.className = 'modal';  
+    modal.innerHTML = `<div class="box">  
+      <h3 style="margin-top:0">Notice</h3>  
+      <p id="modalMsg"></p>  
+      <div class="row" style="justify-content:flex-end"><button id="closeModal" class="ghost">Close</button></div>  
+    </div>`;  
+    document.body.appendChild(modal);  
+    $('#closeModal').addEventListener('click', ()=>modal.classList.remove('show'));  
+  }  
+  $('#modalMsg').textContent = msg;  
+  modal.classList.add('show');  
+}  
+  
+/* -------------------  
+   SERVICE WORKER  
+--------------------*/  
+if('serviceWorker' in navigator){  
+  navigator.serviceWorker.register('service-worker.js');  
+}  
+document.addEventListener("DOMContentLoaded", ()=>{
+
+  const btn = document.getElementById("btnClearAchievements");
+
+  if(btn){
+    btn.addEventListener("click", ()=>{
+
+      if(confirm("Clear all achievements?")){
+
+        state.achievements = [];
+
+        localStorage.setItem("achievements", JSON.stringify([]));
+
+        renderAchievements();
+
+        showModal("🧹 Achievements Cleared");
+
+      }
+
+    });	
+  }
+
+});
+document.querySelectorAll('[data-quiz]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    state.mode = btn.dataset.quiz; // add, sub, mul, div
+    startQuiz(); // 🔥 यहाँ call होगा
+  });
+});
+
+/* -------------------  
+   PARENT DASHBOARD  
+--------------------*/  
+
+function renderParentDashboard(){
+
+  const topics = ['add','sub','mul','div'];
+  const names = {add:'जोड़', sub:'घटाना', mul:'गुणा', div:'भाग'};
+
+  const ctx = document.getElementById('topicChart');
+  if(!ctx) return;
+
+  const data = topics.map(t=>{
+    const s = state.stats[t] || {correct:0,total:1};
+    return Math.round((s.correct/s.total)*100);
+  });
+
+  new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels: topics.map(t=>names[t]),
+      datasets:[{label:'%', data:data}]
+    },
+    options:{scales:{y:{beginAtZero:true,max:100}}}
+  });
+
+  let weak='', strong='';
+
+  topics.forEach(t=>{
+    const s = state.stats[t] || {correct:0,total:1};
+    const per = Math.round((s.correct/s.total)*100);
+
+    if(per<60) weak += `<p>⚠️ ${names[t]}: ${per}%</p>`;
+    if(per>85) strong += `<p>✅ ${names[t]}: ${per}%</p>`;
+  });
+
+  $('#weakTopics').innerHTML = weak || 'सब सही 🎉';
+  $('#strongTopics').innerHTML = strong || 'Practice करो';
+}
+const themes = {
+  purple: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  sunset: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+  ocean: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+  forest: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+  fire: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
+};
+
+function changeTheme(name){
+  // 1. बैकग्राउंड बदलो
+  document.body.style.background = themes[name];
+
+  // 2. एक्टिव बटन हाइलाइट करो
+  document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+
+  // 3. थीम सेव करो ताकि रिफ्रेश पर भी रहे
+  localStorage.setItem('mathQuizTheme', name);
+}
+
+// पेज लोड पर सेव थीम लगाओ
+window.onload = () => {
+  const savedTheme = localStorage.getItem('mathQuizTheme') || 'purple';
+  document.body.style.background = themes[savedTheme];
+  document.querySelector(`[onclick="changeTheme('${savedTheme}')"]`)?.classList.add('active');
+  askQuestion(); // पहला सवाल
+}
+function changeFontSize(size){
+  document.body.className = document.body.className.replace(/font-\w+/g, '');
+  document.body.classList.add('font-' + size);
+  localStorage.setItem('mathQuizFont', size);
+
+  document.querySelectorAll('.font-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// पेज लोड पर सेव साइज़ लगाओ
+window.addEventListener('load', () => {
+  const savedSize = localStorage.getItem('mathQuizFont') || 'medium';
+  document.body.classList.add('font-' + savedSize);
+  document.querySelector(`[onclick="changeFontSize('${savedSize}')"]`)?.classList.add('active');
+});
+function showResult(){
+  clearInterval(timerId);
+
+  let accuracy = state.correct + state.wrong > 0
+   ? Math.round((state.correct/(state.correct+state.wrong))*100)
+    : 0;
+
+  let highScore = localStorage.getItem('mathHighScore') || 0;
+  let isNewRecord = state.score > highScore;
+
+  if(isNewRecord){
+    localStorage.setItem('mathHighScore', state.score);
+  }
+
+  // रिजल्ट सेव करो 7 दिन वाला
+  saveResult();
+
+  // पॉपअप दिखाओ
+  alert(`🎮 गेम खत्म!\n\n🏆 स्कोर: ${state.score}\n✅ सही: ${state.correct}\n❌ गलत: ${state.wrong}\n🎯 एक्यूरेसी: ${accuracy}%\n${isNewRecord?'🏆 नया रिकॉर्ड!':''}`);
+
+  // रीस्टार्ट
+  if(confirm('फिर से खेलोगे?')){
+    startQuiz();
+  }
+}
+
+function saveResult(){
+  let today = new Date().toDateString();
+  let history = JSON.parse(localStorage.getItem('mathWeekHistory') || '{}');
+
+  if(!history[today] || state.score > history[today].score){
+    history[today] = {
+      score: state.score,
+      correct: state.correct,
+      total: state.correct + state.wrong,
+      accuracy: Math.round((state.correct/(state.correct+state.wrong))*100),
+      date: new Date().toLocaleDateString('hi-IN', {weekday:'short', day:'numeric'})
+    };
+  }
+
+  let dates = Object.keys(history).sort((a,b) => new Date(b) - new Date(a));
+  if(dates.length > 7){
+    dates.slice(7).forEach(d => delete history[d]);
+  }
+
+  localStorage.setItem('mathWeekHistory', JSON.stringify(history));
+}
+// WhatsApp शेयर
+document.getElementById("btnShareApp")?.addEventListener("click", ()=>{
+  let score = state.score || 0;
+  let highScore = localStorage.getItem('mathHighScore') || 0;
+
+  let text = `🎮 *Math Quiz Master* खेलो! 🧮✨
+
+मैंने ${highScore} पॉइंट बनाए! 🏆
+तुम भी खेलो और अपना रिकॉर्ड तोड़ो! 💪
+
+📱 *फीचर्स:*
+✅ जोड़, घटाना, गुणा, भाग
+✅ जानवर, फल, पक्षी वाले सवाल 🐅🍎🦜
+✅ 7 दिन का रिजल्ट हिस्ट्री 📊
+✅ डेली रिवॉर्ड + अचीवमेंट 🏅
+✅ 5 कलर थीम + फॉन्ट साइज़ 🎨
+
+👉 अभी खेलो: ${window.location.href}`;
+
+  // WhatsApp लिंक बनाओ
+  let url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+});
+
+// रेट ऐप - Play Store लिंक
+document.getElementById("btnRateApp")?.addEventListener("click", ()=>{
+  // 🔴 अपना Play Store लिंक यहाँ डालो
+  let playStoreLink = 'https://play.google.com/store/apps/details?id=com.mathquizmaster';
+
+  if(confirm('⭐ Play Store पर 5 स्टार रेटिंग दोगे?\n\nआपकी रेटिंग से हमें बहुत मदद मिलेगी!')){
+    window.open(playStoreLink, '_blank');
+  }
+});
+function showResult(){
+  clearInterval(timerId);
+
+  let accuracy = state.correct + state.wrong > 0
+   ? Math.round((state.correct/(state.correct+state.wrong))*100)
+    : 0;
+
+  let highScore = localStorage.getItem('mathHighScore') || 0;
+  let isNewRecord = state.score > highScore;
+
+  if(isNewRecord){
+    localStorage.setItem('mathHighScore', state.score);
+  }
+
+  saveResult();
+
+  // ✅ WhatsApp शेयर प्रॉम्प्ट
+  let msg = `🎮 गेम खत्म!\n\n🏆 स्कोर: ${state.score}\n✅ सही: ${state.correct}\n❌ गलत: ${state.wrong}\n🎯 एक्यूरेसी: ${accuracy}%\n${isNewRecord?'🏆 नया रिकॉर्ड!':''}`;
+
+  if(confirm(msg + '\n\n📱 WhatsApp पर दोस्तों को चैलेंज भेजें?')){
+    let shareText = `🎮 मैंने Math Quiz में ${state.score} पॉइंट बनाए! 🏆\n🎯 एक्यूरेसी: ${accuracy}%\n\nतुम मेरा रिकॉर्ड तोड़ सकते हो? 😎\n\nखेलो: ${window.location.href}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+  }
+
+  if(confirm('फिर से खेलोगे?')){
+    startQuiz();
+  }
+}
+
+</script> 
+ </body>  
+</html>  
